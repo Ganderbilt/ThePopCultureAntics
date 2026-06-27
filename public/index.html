@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Pop Culture Antics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #211E1B;
+    --bg-raised: #2B2723;
+    --ink: #F2ECE3;
+    --ink-dim: #9C948A;
+    --hot: #FF5C7A;
+    --hot-on-hot: #54101C;
+    --yellow: #FFCD4D;
+    --blue: #6FA8FF;
+    --line: #3A352F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* --- Ticker (signature element) --- */
+  .ticker-wrap {
+    background: var(--hot);
+    overflow: hidden;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--bg);
+  }
+  .ticker {
+    display: inline-block;
+    padding: 6px 0;
+    animation: scroll 28s linear infinite;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--hot-on-hot);
+    text-transform: uppercase;
+  }
+  .ticker span { padding: 0 24px; }
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker { animation: none; }
+  }
+
+  /* --- Masthead --- */
+  header.masthead {
+    padding: 28px 20px 18px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  .masthead h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: clamp(32px, 6vw, 56px);
+    letter-spacing: -0.01em;
+    margin: 0;
+    line-height: 1;
+  }
+  .masthead h1 .accent { color: var(--hot); }
+  .masthead .tagline {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+  .masthead .timestamp {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 6px;
+  }
+
+  /* --- Feed --- */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--ink-dim);
+  }
+  .empty-state .big {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  /* --- Lead story: one big headline, Drudge-style --- */
+  .lead-wrap {
+    padding: 26px 0 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .lead-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin-bottom: 10px;
+  }
+  .lead-wrap a.headline {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: clamp(26px, 4vw, 38px);
+    line-height: 1.12;
+    color: var(--blue);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .lead-wrap.breaking a.headline { color: var(--hot); }
+  .lead-wrap a.headline:hover { color: var(--yellow); }
+
+  /* --- Grid of remaining stories --- */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .story {
+    padding: 16px 18px 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .grid > .story:nth-child(3n+1) { padding-left: 0; padding-right: 18px; border-right: 1px solid var(--line); }
+  .grid > .story:nth-child(3n+2) { padding-left: 18px; padding-right: 18px; border-right: 1px solid var(--line); }
+  .grid > .story:nth-child(3n) { padding-left: 18px; padding-right: 0; }
+
+  .story a.headline {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 15.5px;
+    line-height: 1.3;
+    color: var(--blue);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .story a.headline:hover {
+    color: var(--yellow);
+  }
+  .story a.headline:focus-visible,
+  .lead-wrap a.headline:focus-visible {
+    outline: 2px solid var(--yellow);
+    outline-offset: 3px;
+  }
+
+  /* Reserved for genuinely huge stories — not assigned automatically by
+     rank. Add class="breaking" on a story to flag it red. */
+  .story.breaking a.headline {
+    color: var(--hot);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .tag.tmz { background: var(--hot); color: var(--hot-on-hot); }
+  .tag.deadline { background: var(--yellow); color: var(--bg); }
+  .tag.eonline { background: var(--ink); color: var(--bg); }
+  .tag.espn { background: #4ADE80; color: #0B2B17; }
+  .tag.billboard { background: #C084FC; color: #2B0B3D; }
+  .tag.reddit { background: #FF6B35; color: #3D1400; }
+  .tag.washingtonian { background: #5EC8D8; color: #052A30; }
+  .tag.buzzfeed { background: #EE3322; color: #FFFFFF; }
+  .tag.hyperallergic { background: #FFFFFF; color: #1A1A1A; }
+  .tag.knowyourmeme { background: #FF8C42; color: #2B1500; }
+  .tag.theonion { background: #C9A845; color: #2B2200; }
+  .tag.cracked { background: #8FA9C9; color: #0F1E2E; }
+  .tag.borowitz { background: #D9D9D9; color: #1A1A1A; }
+  .tag.newyorkerhumor { background: #1A1A1A; color: #F2ECE3; }
+
+  .meta .time {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  footer {
+    text-align: center;
+    padding: 30px 20px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+  footer .legal {
+    max-width: 700px;
+    margin: 14px auto 0;
+    padding: 16px 20px 0;
+    border-top: 1px solid var(--line);
+    font-size: 10px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    opacity: 0.85;
+  }
+
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .grid > .story:nth-child(3n) { padding-left: 18px; padding-right: 18px; border-right: 1px solid var(--line); }
+    .grid > .story:nth-child(2n) { padding-right: 0; border-right: none; }
+  }
+
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: 1fr; }
+    .grid > .story { padding-left: 0; padding-right: 0; border-right: none; }
+    .lead-wrap a.headline { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span>LOADING TODAY'S NOISE&hellip;</span>
+  </div>
+</div>
+
+<header class="masthead">
+  <h1>THE POP<span class="accent">CULTURE</span>ANTICS</h1>
+  <div class="tagline">What everyone's actually talking about</div>
+</header>
+
+<main id="feed">
+  <div class="empty-state">
+    <div class="big">Loading&hellip;</div>
+  </div>
+</main>
+
+<footer>
+  THE POP CULTURE ANTICS &middot; curated, not algorithmic
+  <div class="legal">
+    This page links to and excerpts headlines from third-party news sources.
+    We do not host, write, or claim ownership of the linked articles, and
+    are not responsible for their content or accuracy &mdash; click through
+    to the original source for the full story. Site design and curation
+    &copy; <span id="copyright-year"></span> Ganderbilt.
+  </div>
+</footer>
+
+<script>
+  const tagLabels = { tmz: 'TMZ', deadline: 'Deadline', eonline: "E!", espn: 'ESPN', billboard: 'Billboard', reddit: 'Reddit', washingtonian: 'Washingtonian', buzzfeed: 'BuzzFeed', hyperallergic: 'Hyperallergic', knowyourmeme: 'Know Your Meme', theonion: 'The Onion', cracked: 'Cracked', borowitz: 'Borowitz Report', newyorkerhumor: 'New Yorker' };
+
+  document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+  function timeAgo(iso) {
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const mins = Math.round(diffMs / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.round(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    return Math.round(hrs / 24) + 'd ago';
+  }
+
+  async function loadFeed() {
+    const res = await fetch('/api/approved');
+    const items = await res.json();
+    const feed = document.getElementById('feed');
+    const ticker = document.getElementById('ticker');
+
+    if (!items.length) {
+      feed.innerHTML = '<div class="empty-state"><div class="big">Nothing approved yet.</div>The queue is empty &mdash; check the admin page to pick today&rsquo;s stories.</div>';
+      ticker.innerHTML = '<span>THE POP CULTURE ANTICS &mdash; CHECK BACK SOON</span><span>THE POP CULTURE ANTICS &mdash; CHECK BACK SOON</span>';
+      return;
+    }
+
+    const [leadItem, ...restItems] = items;
+
+    const renderMeta = (item) => `
+      <div class="meta">
+        <span class="tag ${item.tag}">${item.subreddit ? 'r/' + item.subreddit : (tagLabels[item.tag] || item.source)}</span>
+        <span class="time">${timeAgo(item.pubDate)}</span>
+      </div>
+    `;
+
+    const leadHtml = `
+      <div class="lead-wrap ${leadItem.breaking ? 'breaking' : ''}">
+        <div class="lead-label">Top Story</div>
+        <a class="headline" href="${leadItem.link}" target="_blank" rel="noopener">${leadItem.title}</a>
+        ${renderMeta(leadItem)}
+      </div>
+    `;
+
+    const gridHtml = `
+      <div class="grid">
+        ${restItems.map((item) => `
+          <div class="story ${item.breaking ? 'breaking' : ''}">
+            <a class="headline" href="${item.link}" target="_blank" rel="noopener">${item.title}</a>
+            ${renderMeta(item)}
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    feed.innerHTML = leadHtml + gridHtml;
+
+    const tickerText = items.map(i => i.title.toUpperCase()).join('   &bull;   ');
+    ticker.innerHTML = `<span>${tickerText}</span><span>${tickerText}</span>`;
+  }
+
+  loadFeed();
+  setInterval(loadFeed, 60000);
+</script>
+
+</body>
+</html>

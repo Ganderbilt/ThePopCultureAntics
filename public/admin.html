@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Curation Queue — The Pop Culture Antics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #211E1B;
+    --bg-raised: #2B2723;
+    --ink: #F2ECE3;
+    --ink-dim: #9C948A;
+    --hot: #FF5C7A;
+    --hot-on-hot: #54101C;
+    --yellow: #FFCD4D;
+    --blue: #6FA8FF;
+    --green: #3FCF8E;
+    --line: #3A352F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+  }
+  header {
+    padding: 22px 20px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 20px;
+    margin: 0;
+  }
+  header h1 .accent { color: var(--hot); }
+  .actions { display: flex; gap: 10px; }
+  button {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 14px;
+    cursor: pointer;
+  }
+  button.refresh { background: var(--yellow); color: var(--bg); }
+  button.refresh:hover { opacity: 0.85; }
+
+  main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 800px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  .column h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-dim);
+    margin: 0 0 12px;
+  }
+
+  .card {
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .card .title {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+  .card .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .tag.tmz { background: var(--hot); color: var(--hot-on-hot); }
+  .tag.deadline { background: var(--yellow); color: var(--bg); }
+  .tag.eonline { background: var(--ink); color: var(--bg); }
+  .tag.espn { background: #4ADE80; color: #0B2B17; }
+  .tag.billboard { background: #C084FC; color: #2B0B3D; }
+  .tag.reddit { background: #FF6B35; color: #3D1400; }
+  .tag.washingtonian { background: #5EC8D8; color: #052A30; }
+  .tag.buzzfeed { background: #EE3322; color: #FFFFFF; }
+  .tag.hyperallergic { background: #FFFFFF; color: #1A1A1A; }
+  .tag.knowyourmeme { background: #FF8C42; color: #2B1500; }
+  .tag.theonion { background: #C9A845; color: #2B2200; }
+  .tag.cracked { background: #8FA9C9; color: #0F1E2E; }
+  .tag.borowitz { background: #D9D9D9; color: #1A1A1A; }
+  .tag.newyorkerhumor { background: #1A1A1A; color: #F2ECE3; }
+
+  .card-actions { display: flex; gap: 6px; }
+  .card-actions button { padding: 6px 10px; font-size: 11px; }
+  button.approve { background: var(--green); color: var(--bg); }
+  button.reject { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); }
+  button.up, button.down { background: transparent; color: var(--ink); border: 1px solid var(--line); padding: 6px 9px; }
+  button.breaking-btn { background: transparent; color: var(--hot); border: 1px solid var(--hot); }
+  button.make-lead-btn { background: var(--blue); color: #0A1A33; border: none; font-weight: 700; }
+  button.make-lead-btn:disabled { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); cursor: default; }
+
+  .breaking-flag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--hot-on-hot);
+    background: var(--hot);
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 4px;
+  }
+
+  .lead-flag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #0A1A33;
+    background: var(--blue);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .comment-flag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #3D1400;
+    background: #FF6B35;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .empty {
+    color: var(--ink-dim);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 20px 0;
+  }
+
+  .status-banner {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    padding: 0 20px;
+    max-width: 920px;
+    margin: 14px auto 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>POP<span class="accent">CULTURE</span> &mdash; CURATION QUEUE</h1>
+  <div class="actions">
+    <button class="refresh" id="refresh-btn">Pull latest headlines</button>
+  </div>
+</header>
+<div class="status-banner" id="status"></div>
+
+<main>
+  <div class="column">
+    <h2>Pending — pick what runs</h2>
+    <div id="pending-list"></div>
+  </div>
+  <div class="column">
+    <h2>Approved — live on site (drag order with ↑↓)</h2>
+    <div id="approved-list"></div>
+  </div>
+</main>
+
+<script>
+  const tagLabels = { tmz: 'TMZ', deadline: 'Deadline', eonline: "E!", espn: 'ESPN', billboard: 'Billboard', reddit: 'Reddit', washingtonian: 'Washingtonian', buzzfeed: 'BuzzFeed', hyperallergic: 'Hyperallergic', knowyourmeme: 'Know Your Meme', theonion: 'The Onion', cracked: 'Cracked', borowitz: 'Borowitz Report', newyorkerhumor: 'New Yorker' };
+
+  async function refresh() {
+    const status = document.getElementById('status');
+    status.textContent = 'Pulling latest…';
+    const res = await fetch('/api/refresh', { method: 'POST' });
+    const data = await res.json();
+    if (data.sample) {
+      status.textContent = `Pulled ${data.count} sample items. (Live feeds are blocked from this environment — see note in feeds.js. Will pull real headlines once deployed.)`;
+    } else {
+      status.textContent = `Pulled ${data.count} live items just now.`;
+    }
+    loadAll();
+  }
+
+  async function loadAll() {
+    const all = await (await fetch('/api/items')).json();
+    const pending = all.filter(i => i.status === 'pending');
+    const approved = all.filter(i => i.status === 'approved')
+      .sort((a, b) => {
+        // keep approved order as stored server-side; fallback to recency
+        return 0;
+      });
+
+    renderPending(pending);
+    renderApproved(approved);
+  }
+
+  function renderPending(items) {
+    const el = document.getElementById('pending-list');
+    if (!items.length) {
+      el.innerHTML = '<div class="empty">No pending items. Click "Pull latest headlines" above.</div>';
+      return;
+    }
+    el.innerHTML = items.map(item => `
+      <div class="card">
+        <div class="title">${item.isComment ? '<span class="comment-flag">COMMENT</span> ' : ''}${item.title}</div>
+        <div class="row">
+          <span class="tag ${item.tag}">${item.subreddit ? 'r/' + item.subreddit : (tagLabels[item.tag] || item.source)}</span>
+          <div class="card-actions">
+            <button class="approve" data-id="${item.id}" data-action="approve">Approve</button>
+            <button class="reject" data-id="${item.id}" data-action="reject">Skip</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderApproved(items) {
+    const el = document.getElementById('approved-list');
+    if (!items.length) {
+      el.innerHTML = '<div class="empty">Nothing approved yet — the public page will show an empty state.</div>';
+      return;
+    }
+    el.innerHTML = items.map((item, i) => `
+      <div class="card">
+        <div class="title">${i === 0 ? '<span class="lead-flag">LEAD</span> ' : ''}${item.title}${item.breaking ? ' <span class="breaking-flag">BREAKING</span>' : ''}</div>
+        <div class="row">
+          <span class="tag ${item.tag}">${item.subreddit ? 'r/' + item.subreddit : (tagLabels[item.tag] || item.source)}</span>
+          <div class="card-actions">
+            <button class="make-lead-btn" data-id="${item.id}" data-action="make-lead" ${i === 0 ? 'disabled' : ''}>Make Lead</button>
+            <button class="up" data-id="${item.id}" data-action="up" ${i === 0 ? 'disabled' : ''}>&uarr;</button>
+            <button class="down" data-id="${item.id}" data-action="down" ${i === items.length - 1 ? 'disabled' : ''}>&darr;</button>
+            <button class="breaking-btn" data-id="${item.id}" data-action="toggle-breaking">${item.breaking ? 'Unmark breaking' : 'Mark breaking'}</button>
+            <button class="reject" data-id="${item.id}" data-action="reject">Remove</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    el._items = items;
+  }
+
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const action = btn.dataset.action;
+
+    if (action === 'approve') {
+      await fetch(`/api/approve/${id}`, { method: 'POST' });
+    } else if (action === 'reject') {
+      await fetch(`/api/reject/${id}`, { method: 'POST' });
+    } else if (action === 'toggle-breaking') {
+      await fetch(`/api/toggle-breaking/${id}`, { method: 'POST' });
+    } else if (action === 'make-lead') {
+      const el = document.getElementById('approved-list');
+      const items = el._items.map(i => i.id);
+      const idx = items.indexOf(id);
+      if (idx > 0) {
+        items.splice(idx, 1);
+        items.unshift(id);
+        await fetch('/api/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderedIds: items })
+        });
+      }
+    } else if (action === 'up' || action === 'down') {
+      const el = document.getElementById('approved-list');
+      const items = el._items.map(i => i.id);
+      const idx = items.indexOf(id);
+      const swapWith = action === 'up' ? idx - 1 : idx + 1;
+      if (swapWith >= 0 && swapWith < items.length) {
+        [items[idx], items[swapWith]] = [items[swapWith], items[idx]];
+        await fetch('/api/reorder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderedIds: items })
+        });
+      }
+    }
+    loadAll();
+  });
+
+  document.getElementById('refresh-btn').addEventListener('click', refresh);
+
+  loadAll();
+</script>
+
+</body>
+</html>
