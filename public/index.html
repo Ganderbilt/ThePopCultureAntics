@@ -29,33 +29,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* --- Ticker (signature element) --- */
-  .ticker-wrap {
-    background: var(--hot);
-    overflow: hidden;
-    white-space: nowrap;
-    border-bottom: 2px solid var(--bg);
-  }
-  .ticker {
-    display: inline-block;
-    padding: 6px 0;
-    animation: scroll 28s linear infinite;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: var(--hot-on-hot);
-    text-transform: uppercase;
-  }
-  .ticker span { padding: 0 24px; }
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .ticker { animation: none; }
-  }
-
   /* --- Masthead --- */
   header.masthead {
     padding: 28px 20px 18px;
@@ -240,12 +213,6 @@
 </head>
 <body>
 
-<div class="ticker-wrap">
-  <div class="ticker" id="ticker">
-    <span>LOADING TODAY'S NOISE&hellip;</span>
-  </div>
-</div>
-
 <header class="masthead">
   <h1>THE POP<span class="accent">CULTURE</span>ANTICS</h1>
   <div class="tagline">What everyone's actually talking about</div>
@@ -287,11 +254,9 @@
     const res = await fetch('/api/approved');
     const items = await res.json();
     const feed = document.getElementById('feed');
-    const ticker = document.getElementById('ticker');
 
     if (!items.length) {
       feed.innerHTML = '<div class="empty-state"><div class="big">Nothing approved yet.</div>The queue is empty &mdash; check the admin page to pick today&rsquo;s stories.</div>';
-      ticker.innerHTML = '<span>THE POP CULTURE ANTICS &mdash; CHECK BACK SOON</span><span>THE POP CULTURE ANTICS &mdash; CHECK BACK SOON</span>';
       return;
     }
 
@@ -324,9 +289,6 @@
     `;
 
     feed.innerHTML = leadHtml + gridHtml;
-
-    const tickerText = items.map(i => i.title.toUpperCase()).join('   &bull;   ');
-    ticker.innerHTML = `<span>${tickerText}</span><span>${tickerText}</span>`;
   }
 
   loadFeed();
