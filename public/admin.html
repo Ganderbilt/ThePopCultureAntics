@@ -220,11 +220,14 @@
   async function loadAll() {
     const all = await (await fetch('/api/items')).json();
     const pending = all.filter(i => i.status === 'pending');
-    const approved = all.filter(i => i.status === 'approved')
-      .sort((a, b) => {
-        // keep approved order as stored server-side; fallback to recency
-        return 0;
-      });
+
+    // Use /api/approved specifically, not a filter over /api/items — the
+    // items list has no guaranteed order, but /api/approved reflects the
+    // actual server-side order that reorder/make-lead/up/down all update.
+    // Using the wrong source here was the cause of "Make Lead" appearing
+    // to do nothing: the action worked, but this page was redrawing from
+    // an unordered list afterward, undoing the visible effect.
+    const approved = await (await fetch('/api/approved')).json();
 
     renderPending(pending);
     renderApproved(approved);
