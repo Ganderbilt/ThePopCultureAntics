@@ -54,6 +54,7 @@ function rowToItem(row) {
 }
 
 async function mergeIncoming(newItems) {
+  console.log(`[store] mergeIncoming called with ${newItems.length} items`);
   if (!newItems.length) return;
 
   // Only insert items that don't already exist — an upsert with
@@ -74,9 +75,14 @@ async function mergeIncoming(newItems) {
     fetched_at: new Date().toISOString(),
   }));
 
-  const { error } = await supabase
+  console.log(`[store] attempting upsert of ${rows.length} rows. SUPABASE_URL set: ${!!SUPABASE_URL}, SUPABASE_KEY set: ${!!SUPABASE_KEY}`);
+
+  const { data, error, status, statusText } = await supabase
     .from("items")
-    .upsert(rows, { onConflict: "id", ignoreDuplicates: true });
+    .upsert(rows, { onConflict: "id", ignoreDuplicates: true })
+    .select();
+
+  console.log(`[store] upsert result — status: ${status} ${statusText}, error: ${error ? JSON.stringify(error) : 'none'}, returned rows: ${data ? data.length : 'null'}`);
 
   if (error) {
     console.error("[store] mergeIncoming error:", error.message);
