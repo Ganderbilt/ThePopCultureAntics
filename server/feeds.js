@@ -302,13 +302,25 @@ async function fetchRssSource(source) {
   const items = [];
   const feed = await parser.parseURL(source.url);
   for (const entry of feed.items) {
+    // entry.pubDate from rss-parser is often the raw RFC 822-style string
+    // straight from the feed (e.g. "Sat, 27 Jun 2026 17:43:00 +0000"), not
+    // guaranteed ISO 8601 — Postgres's timestamptz column can reject a
+    // malformed date string, and depending on how that surfaces through
+    // a batch upsert, it can be easy to miss in logs. Normalize to a
+    // real ISO string here, with a safe fallback if parsing fails.
+    const rawDate = entry.pubDate || entry.isoDate;
+    const parsedDate = rawDate ? new Date(rawDate) : null;
+    const pubDate = parsedDate && !isNaN(parsedDate.getTime())
+      ? parsedDate.toISOString()
+      : new Date().toISOString();
+
     const item = {
       source: source.name,
       tag: source.tag,
       category: source.category,
       title: entry.title,
       link: entry.link,
-      pubDate: entry.pubDate || entry.isoDate || new Date().toISOString(),
+      pubDate,
     };
     items.push({ ...item, id: makeId(item) });
   }

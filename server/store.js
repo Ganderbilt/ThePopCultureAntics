@@ -84,6 +84,15 @@ async function mergeIncoming(newItems) {
 
   console.log(`[store] upsert result — status: ${status} ${statusText}, error: ${error ? JSON.stringify(error) : 'none'}, returned rows: ${data ? data.length : 'null'}`);
 
+  // Immediately re-query the table to see if the rows are actually
+  // present right after the upsert call resolves — rules out a
+  // transaction-rollback or timing issue that a "successful" response
+  // wouldn't otherwise reveal.
+  const { count: verifyCount, error: verifyError } = await supabase
+    .from("items")
+    .select("*", { count: "exact", head: true });
+  console.log(`[store] immediate post-upsert count check: ${verifyCount}, error: ${verifyError ? JSON.stringify(verifyError) : 'none'}`);
+
   if (error) {
     console.error("[store] mergeIncoming error:", error.message);
   }
