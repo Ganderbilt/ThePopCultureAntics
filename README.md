@@ -166,6 +166,42 @@ legal advice — if you want a lawyer's review before this goes fully
 public, that's a reasonable thing to get, but this follows the same
 basic approach link-aggregator sites like Drudge have used for years.
 
+## Admin password
+
+The admin page (`/admin.html`) and every route that can change data —
+pulling new headlines, approving, rejecting, reordering, marking
+breaking — are protected by a single shared password. Without this set,
+anyone who found the admin URL could edit your live site with no
+password at all, which was true of every earlier version of this app
+until now.
+
+**This is required, not optional.** If `ADMIN_PASSWORD` isn't set, the
+admin page and all editing routes return an error (503) instead of
+silently being left open — the app fails safe rather than fails open.
+The public page and its read-only feed are unaffected either way; they
+were always meant to be open to everyone.
+
+### Setup
+
+- **On Render**: Environment tab → add `ADMIN_PASSWORD` with whatever
+  password you want to use.
+- **On your own computer**: add the same key to your local `.env` file
+  (see `.env.example`).
+
+Logging in at `/login.html` sets a session that lasts 30 days or until
+you click "Log out" on the admin page (which immediately invalidates
+that session — verified directly, not just clearing the cookie
+client-side). Logging in again from anywhere immediately ends any other
+existing session, since only one person should be acting as the editor
+at a time.
+
+One real limitation worth knowing: sessions are stored in the server's
+memory, not in Supabase. That means every time Render redeploys (a new
+code push, or the free tier waking up after sleeping), you'll be logged
+out and need to log in again. For a personal site updated by one person,
+this is a minor inconvenience rather than a real problem — but it's
+honest to flag rather than let it surprise you.
+
 ## Storage: Supabase (replaces the old JSON file)
 
 Earlier versions of this app stored your curated list in a plain file

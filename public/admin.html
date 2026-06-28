@@ -55,6 +55,8 @@
   }
   button.refresh { background: var(--yellow); color: var(--bg); }
   button.refresh:hover { opacity: 0.85; }
+  button.logout { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); }
+  button.logout:hover { color: var(--ink); border-color: var(--ink-dim); }
 
   main {
     max-width: 920px;
@@ -186,6 +188,7 @@
   <h1>POP<span class="accent">CULTURE</span> &mdash; CURATION QUEUE</h1>
   <div class="actions">
     <button class="refresh" id="refresh-btn">Pull latest headlines</button>
+    <button class="logout" id="logout-btn">Log out</button>
   </div>
 </header>
 <div class="status-banner" id="status"></div>
@@ -320,6 +323,10 @@
   });
 
   document.getElementById('refresh-btn').addEventListener('click', refresh);
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.href = '/login.html';
+  });
 
   loadAll();
 </script>

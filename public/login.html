@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login — The Pop Culture Antics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #211E1B;
+    --ink: #F2ECE3;
+    --ink-dim: #9C948A;
+    --hot: #FF5C7A;
+    --blue: #6FA8FF;
+    --line: #3A352F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .box {
+    width: 100%;
+    max-width: 360px;
+    padding: 32px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    margin: 0 0 6px;
+    text-align: center;
+  }
+  h1 .accent { color: var(--hot); }
+  .subtitle {
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    background: #2B2723;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: 'Archivo', sans-serif;
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  input[type="password"]:focus {
+    outline: 2px solid var(--blue);
+    outline-offset: 1px;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: var(--blue);
+    color: #0A1A33;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.9; }
+  .error {
+    color: var(--hot);
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h1>POP<span class="accent">CULTURE</span> ADMIN</h1>
+  <div class="subtitle">Enter password to continue</div>
+  <form id="login-form">
+    <input type="password" id="password" placeholder="Password" autofocus />
+    <button type="submit">Log In</button>
+    <div class="error" id="error"></div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('error');
+    errorEl.textContent = '';
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        window.location.href = '/admin.html';
+      } else {
+        errorEl.textContent = data.error || 'Login failed.';
+      }
+    } catch (err) {
+      errorEl.textContent = 'Something went wrong. Try again.';
+    }
+  });
+</script>
+
+</body>
+</html>
