@@ -166,7 +166,52 @@ legal advice — if you want a lawyer's review before this goes fully
 public, that's a reasonable thing to get, but this follows the same
 basic approach link-aggregator sites like Drudge have used for years.
 
-## Running it on your own computer
+## Storage: Supabase (replaces the old JSON file)
+
+Earlier versions of this app stored your curated list in a plain file
+(`server/data.json`) sitting next to the code. That worked fine, but it
+had a real problem: Render wipes that file every time you push a code
+update and the service redeploys — meaning your whole curated list had
+to be rebuilt from scratch after every single change. This version fixes
+that by storing everything in Supabase (a real, persistent database)
+instead. Your curated list now survives deploys.
+
+**This is now a required setup step, not optional** — even sample data
+needs real Supabase credentials, because saving fetched items (sample or
+live) always writes to the database. Setup takes about 10 minutes:
+
+### One-time setup
+
+1. **Create a Supabase project** at [supabase.com](https://supabase.com)
+   if you don't already have one (you mentioned already having an
+   account for another project — you can either reuse that account and
+   create a *new* project for this app, or reuse the same project with
+   a different table name; a separate project is simpler and keeps
+   things from getting tangled together).
+2. **Run the schema**: open your project, go to the **SQL Editor** (left
+   sidebar), paste in the entire contents of `supabase-schema.sql` (in
+   this folder), and click **Run**. This creates the one table the app
+   needs.
+3. **Get your credentials**: in your Supabase project, go to **Settings
+   → API**. You need two values:
+   - **Project URL** (looks like `https://abcdefghijk.supabase.co`)
+   - A key — Supabase has two naming generations for this; use whichever
+     one your dashboard shows that's meant for full server-side access
+     (historically called `service_role`, now sometimes called
+     `secret`). **Never use the `anon`/`publishable` key for this app**
+     — that one's meant for browser code and doesn't have permission to
+     write data the way this app needs.
+4. **Set environment variables**:
+   - **On Render**: go to your service → **Environment** (left sidebar)
+     → add `SUPABASE_URL` and `SUPABASE_KEY` with the values from step 3.
+   - **On your own computer**: copy `.env.example` to a new file named
+     `.env` (same folder), and fill in the same two values there.
+
+That's it — once those two variables are set, both your live site and
+your local testing will read/write the same persistent Supabase
+database (or different ones, if you used separate Supabase projects —
+your call).
+
 
 You need [Node.js](https://nodejs.org) installed (the free, official
 installer — just click through it like any other app).
@@ -224,12 +269,25 @@ from the `RSS_SOURCES` list in `feeds.js` without affecting the others.
 
 This is built to run at $0:
 - All the RSS/JSON feeds are free, public, and need no account or API key.
-- Data is stored in a plain file (`server/data.json`) on whatever
-  computer runs it — no database needed, no database costs.
-- If you later want it running online 24/7 instead of only while your
-  computer is on, free tiers on Render, Railway, or similar are enough
-  for a personal project like this — that's a deployment step, not a
-  rebuild, since this is a plain Node.js/Express app.
+- Supabase's free tier (500 MB database storage, confirmed current as of
+  mid-2026) is enormous overkill for what this app stores — headline
+  text and links, nowhere near a database that small project sizes
+  would ever fill.
+- Render's free web service tier covers a personal project like this.
+
+**One real thing to know about Supabase's free tier**: a free project
+pauses itself automatically after 7 days with no database activity, and
+has to be manually un-paused from the Supabase dashboard afterward —
+your data isn't lost, but the site goes offline until you do that. Given
+this app's "click Pull latest headlines whenever you feel like it"
+workflow rather than a guaranteed daily visit, this is worth knowing
+about up front rather than discovering during a week you didn't check
+in. If that risk bothers you, options include: visiting the admin page
+at least once a week (even just to look, since loading `/api/items` or
+`/api/approved` counts as activity), setting up a free external "ping"
+service (like UptimeRobot) to hit your site on a schedule, or upgrading
+Supabase to its $25/month Pro tier if the site becomes something you
+don't want to risk going offline.
 
 There is no AI/Claude API cost in this version — headlines are shown
 exactly as the sources wrote them.
@@ -245,7 +303,13 @@ category — the rest of the app handles it automatically.
 - `server/server.js` — the web server (routes for public page, admin
   page, and the approve/reject/reorder/breaking actions)
 - `server/feeds.js` — fetches and parses all sources (RSS + Reddit)
-- `server/store.js` — saves/loads your curation choices to a file,
-  including auto-expiry logic
+- `server/store.js` — saves/loads your curation choices, backed by
+  Supabase (a real persistent database — see "Storage: Supabase" above)
+- `supabase-schema.sql` — run this once in Supabase's SQL Editor to
+  create the table the app needs
+- `.env.example` — template for local credentials; copy to `.env` and
+  fill in your real Supabase URL/key (the real `.env` file is
+  intentionally excluded from Git via `.gitignore` — never commit real
+  credentials)
 - `public/index.html` — the public-facing page (lead + grid layout)
 - `public/admin.html` — your private curation queue

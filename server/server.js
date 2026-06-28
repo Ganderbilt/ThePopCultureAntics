@@ -4,6 +4,11 @@
 //   POST /api/refresh      -> pull latest from RSS feeds
 //   POST /api/approve/:id, /api/reject/:id, /api/reorder
 
+require("dotenv").config(); // loads SUPABASE_URL / SUPABASE_KEY from a local .env file
+                             // when running on your own computer. On Render, environment
+                             // variables are set directly in their dashboard instead, and
+                             // this line has no effect there (no .env file exists, which is fine).
+
 const express = require("express");
 const path = require("path");
 const { fetchAllFeeds, USE_SAMPLE_DATA } = require("./feeds");
@@ -20,39 +25,63 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 app.post("/api/refresh", async (req, res) => {
   try {
     const items = await fetchAllFeeds();
-    store.mergeIncoming(items);
+    await store.mergeIncoming(items);
     res.json({ ok: true, count: items.length, sample: USE_SAMPLE_DATA });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
 
-app.get("/api/items", (req, res) => {
-  res.json(store.getAll());
+app.get("/api/items", async (req, res) => {
+  try {
+    res.json(await store.getAll());
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
-app.get("/api/approved", (req, res) => {
-  res.json(store.getApproved());
+app.get("/api/approved", async (req, res) => {
+  try {
+    res.json(await store.getApproved());
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
-app.post("/api/approve/:id", (req, res) => {
-  store.approve(req.params.id);
-  res.json({ ok: true });
+app.post("/api/approve/:id", async (req, res) => {
+  try {
+    await store.approve(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
-app.post("/api/reject/:id", (req, res) => {
-  store.reject(req.params.id);
-  res.json({ ok: true });
+app.post("/api/reject/:id", async (req, res) => {
+  try {
+    await store.reject(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
-app.post("/api/reorder", (req, res) => {
-  store.reorder(req.body.orderedIds || []);
-  res.json({ ok: true });
+app.post("/api/reorder", async (req, res) => {
+  try {
+    await store.reorder(req.body.orderedIds || []);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
-app.post("/api/toggle-breaking/:id", (req, res) => {
-  store.toggleBreaking(req.params.id);
-  res.json({ ok: true });
+app.post("/api/toggle-breaking/:id", async (req, res) => {
+  try {
+    await store.toggleBreaking(req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
 });
 
 app.listen(PORT, () => {
