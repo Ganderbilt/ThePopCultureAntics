@@ -134,6 +134,29 @@ const RSS_SOURCES = [
   // turned out wrong (malformed-XML and 404 respectively). Worth
   // revisiting only by visiting their sites directly to find the real
   // feed URL, rather than guessing again.
+
+  // General/world news — the gap this project had no source for at all:
+  // a real news event (an earthquake, an election, a corporate collapse)
+  // happening with nothing in the queue to reflect it. Paired
+  // deliberately: one neutral wire-style source and one tabloid-flavored
+  // one, rather than relying on a single outlet's voice for "something
+  // actually happened in the world."
+  {
+    name: "BBC News",
+    url: "https://feeds.bbci.co.uk/news/rss.xml",
+    tag: "bbc",
+    category: "news",
+  },
+  // New York Post is a real-news source but a conservative tabloid, not
+  // a neutral wire service — worth knowing the lean going in, same as
+  // any other single outlet. Its tone matches your existing TMZ/BuzzFeed
+  // sources reasonably well.
+  {
+    name: "New York Post",
+    url: "https://nypost.com/feed",
+    tag: "nypost",
+    category: "news",
+  },
 ];
 
 // Reddit sources, fetched via their public JSON endpoint rather than RSS.
@@ -282,6 +305,18 @@ const SAMPLE_ITEMS = [
     title: "A Brief History Of This Week's Cultural Moment, As Told By Someone Exhausted By It",
     link: "https://www.newyorker.com/sample-21",
     pubDate: new Date(Date.now() - 1000 * 60 * 95).toISOString(),
+  },
+  {
+    source: "BBC News", tag: "bbc", category: "news",
+    title: "World Leaders Respond After Overnight Developments",
+    link: "https://www.bbc.com/news/sample-25",
+    pubDate: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+  },
+  {
+    source: "New York Post", tag: "nypost", category: "news",
+    title: "City Officials Scramble After Surprise Announcement",
+    link: "https://nypost.com/sample-26",
+    pubDate: new Date(Date.now() - 1000 * 60 * 50).toISOString(),
   },
 ];
 

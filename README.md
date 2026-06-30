@@ -22,6 +22,15 @@ given day.
 
 ## Sources
 
+- **BBC News** — general/world news. Added specifically to fill a real
+  gap: previously, if something genuinely big happened in the world (an
+  earthquake, an election, a corporate collapse), there was nothing in
+  the queue to reflect it. BBC is a neutral, wire-style source, not
+  tabloid-flavored like the rest of this list.
+- **New York Post** — also real news, but a conservative tabloid, not a
+  neutral wire service; worth knowing the lean going in, same as any
+  single outlet. Its tone is closer to TMZ/BuzzFeed than BBC's.
+
 - **TMZ, Deadline, E! Online** — entertainment/celebrity news (RSS)
 - **ESPN** — sports (RSS), capped lower than other sources (4 items per
   refresh instead of the default 10) since ESPN publishes far more
@@ -114,6 +123,15 @@ for this). It returned a 404 once deployed, meaning that endpoint has
 likely changed or been deprecated. It's been removed; revisiting this
 would mean either finding a new unofficial endpoint (no guarantee of
 stability) or a paid trends data provider.
+
+**AP (Associated Press)** was considered as a general-news source
+alongside BBC News, but search results were genuinely contradictory —
+some sources list active AP RSS feeds, others say AP discontinued RSS
+entirely. Rather than add a likely-broken source and find out from a
+404 in the logs, BBC News and New York Post were added instead, both
+confirmed via multiple independent sources to have real, working feeds.
+Worth revisiting AP directly on their own site if you want a second
+neutral wire-style source later.
 
 Each source is capped at its 10 most recent items per refresh (ESPN uses
 4, see above), so a high-volume source doesn't flood the queue and bury
