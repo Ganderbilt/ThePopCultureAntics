@@ -133,10 +133,21 @@ confirmed via multiple independent sources to have real, working feeds.
 Worth revisiting AP directly on their own site if you want a second
 neutral wire-style source later.
 
-Each source is capped at its 10 most recent items per refresh (ESPN uses
-4, see above), so a high-volume source doesn't flood the queue and bury
-everything else. A story that's still relevant will simply show up again
-on your next refresh.
+Each source has a per-refresh cap on how many of its most recent items
+get pulled in, so a high-volume source doesn't flood the queue and bury
+everything else. The default is 10. Overrides: ESPN is capped at 4 (it
+publishes far more often than anything else here); Hyperallergic, Know
+Your Meme, and The Onion are raised to 20, and Cracked/Borowitz/New
+Yorker Humor to 15 — these are exactly the low-volume, high-value
+"appreciator" sources you want *more* of per refresh, not less.
+
+A story that's no longer in the latest pull because something newer
+bumped it out of the cap isn't deleted — it's still sitting in your
+database as a pending item, just not freshly re-fetched. Use the
+**source filter dropdown** above the Pending column on the admin page
+to browse everything still pending from one specific source (e.g. "show
+me only Hyperallergic"), rather than only seeing whatever happened to
+be in the most recent refresh.
 
 ## Layout: lead story + grid
 

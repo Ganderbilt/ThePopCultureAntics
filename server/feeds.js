@@ -48,8 +48,9 @@ const RSS_SOURCES = [
     url: "https://www.espn.com/espn/rss/news",
     tag: "espn",
     category: "sports",
-    cap: 4, // ESPN publishes far more often than other sources; without
-            // a lower cap it crowds out everything else in the queue
+    cap: 8, // raised from 4 — still well below the default 10 since
+            // ESPN publishes far more often than other sources, but a
+            // little more breathing room for genuinely big sports days
   },
   { name: "Billboard", url: "https://www.billboard.com/feed/", tag: "billboard", category: "music" },
   {
@@ -80,6 +81,10 @@ const RSS_SOURCES = [
     url: "https://hyperallergic.com/tag/memes/feed",
     tag: "hyperallergic",
     category: "memes",
+    cap: 20, // raised from the default 10 — this is exactly the kind of
+             // low-volume, high-value source you want MORE of per
+             // refresh, not less; the default cap exists to hold back
+             // high-volume sources like ESPN, not this one
   },
   // Know Your Meme runs the same kind of editorial roundup format as
   // Hyperallergic ("A Roundup of This Week's Best Memes"), at higher
@@ -90,6 +95,7 @@ const RSS_SOURCES = [
     url: "https://knowyourmeme.com/newsfeed.rss",
     tag: "knowyourmeme",
     category: "memes",
+    cap: 20,
   },
   // The Onion writes the jokes itself rather than rounding up other
   // people's reactions, but it's the closest modern equivalent to the
@@ -100,6 +106,7 @@ const RSS_SOURCES = [
     url: "https://theonion.com/feed",
     tag: "theonion",
     category: "satire",
+    cap: 20,
   },
   // Cracked leans more toward general comedy/listicles than satire tied
   // to one specific real news event — a slightly looser fit than the
@@ -110,21 +117,28 @@ const RSS_SOURCES = [
     url: "https://feeds.feedburner.com/CrackedRSS",
     tag: "cracked",
     category: "satire",
+    cap: 15,
   },
   // Andy Borowitz's satire column — left The New Yorker for Substack.
   // Closest match in this whole list to the original 1985 analogy: each
   // post is one sharp, satirical sentence about that day's actual news.
+  // Substack only includes part of each post in the RSS feed for
+  // non-subscribers — the rest is paywalled — so this is capped back to
+  // the default rather than raised, since more of a partial-article feed
+  // isn't actually more valuable the way more Hyperallergic/Onion is.
   {
     name: "Borowitz Report",
     url: "https://www.borowitzreport.com/feed",
     tag: "borowitz",
     category: "satire",
+    cap: 10,
   },
   {
     name: "The New Yorker (Humor)",
     url: "https://www.newyorker.com/feed/humor",
     tag: "newyorkerhumor",
     category: "satire",
+    cap: 15,
   },
   // The Chaser (Australia), The Beaverton (Canada), and The Betoota
   // Advocate (Australia) were tried and removed after a live deploy:

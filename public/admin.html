@@ -79,6 +79,24 @@
     margin: 0 0 12px;
   }
 
+  .pending-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .pending-header h2 { margin: 0; }
+  #source-filter {
+    background: var(--bg-raised);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+  }
+
   .card {
     background: var(--bg-raised);
     border: 1px solid var(--line);
@@ -197,7 +215,12 @@
 
 <main>
   <div class="column">
-    <h2>Pending — pick what runs</h2>
+    <div class="pending-header">
+      <h2>Pending — pick what runs</h2>
+      <select id="source-filter">
+        <option value="">All sources</option>
+      </select>
+    </div>
     <div id="pending-list"></div>
   </div>
   <div class="column">
@@ -234,8 +257,41 @@
     // an unordered list afterward, undoing the visible effect.
     const approved = await (await fetch('/api/approved')).json();
 
-    renderPending(pending);
+    updateSourceFilterOptions(pending);
+    const filterValue = document.getElementById('source-filter').value;
+    const filteredPending = filterValue
+      ? pending.filter(i => i.tag === filterValue)
+      : pending;
+
+    renderPending(filteredPending);
     renderApproved(approved);
+  }
+
+  function updateSourceFilterOptions(pendingItems) {
+    const select = document.getElementById('source-filter');
+    const previousValue = select.value;
+
+    // Build the option list from whatever sources actually have pending
+    // items right now — this naturally surfaces sources you have a
+    // backlog in (like Hyperallergic items you haven't acted on yet)
+    // without needing a fixed, hardcoded list that could drift out of
+    // sync with the real source list in feeds.js.
+    const counts = {};
+    pendingItems.forEach(i => { counts[i.tag] = (counts[i.tag] || 0) + 1; });
+    const tags = Object.keys(counts).sort((a, b) =>
+      (tagLabels[a] || a).localeCompare(tagLabels[b] || b)
+    );
+
+    select.innerHTML = '<option value="">All sources (' + pendingItems.length + ')</option>' +
+      tags.map(tag =>
+        `<option value="${tag}">${tagLabels[tag] || tag} (${counts[tag]})</option>`
+      ).join('');
+
+    // restore the previously selected filter across refreshes, if it's
+    // still a valid option
+    if (tags.includes(previousValue)) {
+      select.value = previousValue;
+    }
   }
 
   function renderPending(items) {
@@ -329,6 +385,7 @@
     await fetch('/api/logout', { method: 'POST' });
     window.location.href = '/login.html';
   });
+  document.getElementById('source-filter').addEventListener('change', loadAll);
 
   loadAll();
 </script>
